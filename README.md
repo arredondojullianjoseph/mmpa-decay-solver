@@ -1,8 +1,8 @@
 # MMPA-Decay-Solver
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verified against the Bateman analytical solution for U-238 → Th-234 → Pa-234m → U-234. Also tested on a gadolinium-157 absorber case for multi-time-point evaluation.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains.
 
-**Scope:** Verifies the MMPA method's multi-time-point evaluation mechanism against known analytical solutions. Does not test neutronics acceleration.
+**Status:** Planning / early development. No solver code yet. Bateman verification has not been run.
 
 ## Project scope
 
