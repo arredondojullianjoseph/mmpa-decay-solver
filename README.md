@@ -18,7 +18,7 @@ Repository scaffolding only. Core implementation not yet started.
 ## Project Scope
 
 - Decay chain verification (4 isotopes) against Bateman analytical solution
-- Absorber case (gadolinium-157) testing multi-time-point evaluation
+- Absorber case testing multi-time-point evaluation
 - Performance benchmarking vs SciPy Radau
 - Speed-accuracy trade-off analysis
 - **Target success criterion: max relative error < 1e-4**
