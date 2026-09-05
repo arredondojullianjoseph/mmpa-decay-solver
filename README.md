@@ -4,6 +4,7 @@ Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nucle
 **Status:** Early development. Bateman analytical reference is implemented and tested (`src/bateman.py`, `tests/test_bateman.py`). The core MMPA matrix-exponential routine is not started.
 
 **Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com)
+
 **Research supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
 ## Project scope
