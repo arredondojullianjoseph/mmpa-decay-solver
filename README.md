@@ -12,11 +12,6 @@ conservation. **Next:** SciPy Radau integration, then the MMPA routine.
 
 **Research supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
-**Scope:** Four-isotope linear-chain verification and a multi-time-point
-gadolinium-157 absorber case, with a Radau benchmark and a
-speed–accuracy study. Target: maximum relative error below
-$10^{-4}$ on both cases.
-
 ## Mathematical model
 
 ### Governing equation
