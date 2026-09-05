@@ -1,7 +1,10 @@
 # MMPA-Decay-Solver
 Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains.
 
-**Status:** Early development. Solver code is in progress and not yet pushed to this repository. Bateman verification has not been run.
+**Status:** Early development. Bateman analytical reference is implemented and tested (`src/bateman.py`, `tests/test_bateman.py`). The core MMPA matrix-exponential routine is not started.
+
+**Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com)
+**Research supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
 ## Project scope
 - Decay chain verification (4 isotopes) against the Bateman analytical solution
@@ -11,7 +14,7 @@ Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nucle
 - Target success criterion: max relative error below 1e-4 for both cases
 
 ## Current state
-Solver code is actively being written and has not yet been pushed to this repository. Folders below are placeholders until that code lands.
+Bateman analytical reference is implemented and tested. The core MMPA matrix-exponential routine has not been written yet. `src/`, `tests/`, and `data/` hold real code now; `benchmarks/`, `analysis/`, `docs/`, and `slides/` are still placeholders.
 
 ## Planned repository layout
 - `src/` — solver implementation
@@ -24,6 +27,10 @@ Solver code is actively being written and has not yet been pushed to this reposi
 
 ## Next steps
 - Push the core MMPA matrix-exponential routine
-- Verify against the Bateman solution for the 4-isotope decay chain
 - Extend to the gadolinium-157 absorber case
 - Compare against SciPy Radau
+
+## References
+
+Bateman H. 1910. Solution of a system of differential equations occurring in the theory of radio-active transformations. Proc Camb Philos Soc. 15:423-427.
+- Closed-form solution used in `src/bateman.py` as the analytical reference the MMPA solver will be checked against.
