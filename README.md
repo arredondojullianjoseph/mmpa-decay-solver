@@ -63,15 +63,11 @@ a factor in the product vanish and the formula divides by zero, so
 - Input validation rejects an empty chain, a negative decay constant,
   repeated decay constants, and negative time.
 
-## Planned repository layout
+## Repository layout
 
 - `src/` — solver implementation
 - `tests/` — verification against analytical solutions
-- `benchmarks/` — performance comparison against SciPy Radau
-- `analysis/` — error and convergence analysis
 - `data/` — decay constants and reference values
-- `docs/` — documentation
-- `slides/` — presentation materials
 
 ## Next steps
 
