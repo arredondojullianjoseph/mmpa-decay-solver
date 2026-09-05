@@ -1,11 +1,7 @@
 """
 test_bateman.py
 
-This file contains the automated tests for our Bateman reference solution.
-We're checking it against known expected results—like simple exponential decay,
-the standard two-nuclide formula from textbooks, and basic atom conservation.
-We also verify that the input validation catches bad inputs properly.
-Note: The MMPA stuff isn't included here since it hasn't been built yet.
+Tests for the Bateman linear-chain solution
 """
 
 import numpy as np
