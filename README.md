@@ -1,7 +1,7 @@
 # MMPA-Decay-Solver
 
 Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials
-in nuclear decay chains. Currently in early development.
+in nuclear decay chains. Currently in progress.
 
 The analytical Bateman solution for a linear decay chain is implemented
 and tested, as are automated tests that cover the parent-only initial condition and atom
