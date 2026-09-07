@@ -55,7 +55,7 @@ def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
     x_matrix = a_matrix * dt - c * np.eye(n)
 
     lu_piv = lu_factor(x_matrix)   #factors x
-    y = np.asarray(n0, dtype=float).copy(). #Copies the initial vector so the loop below can alter y without changing the inital vector.
+    y = np.asarray(n0, dtype=float).copy() #Copies the initial vector so the loop below can alter y without changing the inital vector.
     result = coeffs[0] * y
 
   #Each step updates y using the fast solve, then adds its weighted share to the total
