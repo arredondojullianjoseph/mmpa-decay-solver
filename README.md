@@ -4,13 +4,13 @@ Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials
 in nuclear decay chains. Currently in early development.
 
 The analytical Bateman solution for a linear decay chain is implemented
-and tested so it can serve as the reference for later numerical work.
-Automated tests cover the parent-only initial condition and atom
-conservation. **Next:** SciPy Radau integration, then the MMPA routine.
+and tested, as are automated tests that cover the parent-only initial condition and atom
+conservation. The MMPA matrix-exponential is also implemented and
+checked against Bateman on the four-isotope chain. **Next:** SciPy
+Radau integration.
 
 **Author:** Jullian J. Arredondo (jjarredondo@liberty.edu)
-
-**Research supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
+**Research Supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
 ## Mathematical model
 
@@ -27,7 +27,7 @@ $$
 
 for each nuclide $k$, where $\lambda_k$ is its decay constant
 ($\mathrm{s}^{-1}$) and $\lambda_0 = 0$ (the parent has no source).
-A stable end member uses the same equation with that nuclide’s
+A stable end member uses the same equation with that nuclide's
 $\lambda_k$ set to $0$.
 
 ### Bateman solution
@@ -52,11 +52,9 @@ a factor in the product vanish and the formula divides by zero, so
 
 ### Current implementation
 
-- `bateman_linear_chain` (`src/bateman.py`) evaluates this closed form
-  directly.
-- Only the parent-only initial condition is supported.
-- Input validation rejects an empty chain, a negative decay constant,
-  repeated decay constants, and negative time.
+- `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical Bateman solution.
+- `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates exp(AΔt) via the MMPA method (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026).
+- `build_linear_chain_matrix` (`src/chain.py`) assembles the decaymatrix A.
 
 ## Repository layout
 
@@ -66,20 +64,23 @@ a factor in the product vanish and the formula divides by zero, so
 
 ## Next steps
 
-- Implement the core MMPA matrix-exponential routine
 - Extend to the gadolinium-157 absorber case
-- Compare against SciPy Radau
+- Compare MMPA against SciPy Radau
 
 ## References
 
 Bateman H. 1910. Solution of a system of differential equations
 occurring in the theory of radio-active transformations.
 *Proc. Camb. Philos. Soc.* 15:423–427.
-
 - Closed-form solution implemented in `src/bateman.py`.
 
 Kawamoto Y, Chiba G, Tsuji M, Narabayashi T. 2015. Numerical solution
 of matrix exponential in burn-up equation using mini-max polynomial
 approximation. *Ann. Nucl. Energy* 80:219–224.
+- Source of the MMPA method implemented in `src/mmpa.py`.
 
-- Source of the MMPA method. Not yet implemented.
+Chiba G, Yamamoto K, Nagano H. 2026. Revisiting mini-max polynomial
+approximation method for nuclear fuel depletion calculation.
+*Ann. Nucl. Energy* 227:111948.
+- Source of the order-16 and order-32 MMPA coefficient tables used in
+  `src/mmpa.py`.
