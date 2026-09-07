@@ -9,7 +9,7 @@ conservation. The MMPA matrix-exponential is also implemented and
 checked against Bateman on the four-isotope chain. **Next:** SciPy
 Radau integration.
 
-**Author:** Jullian J. Arredondo (jjarredondo@liberty.edu)
+**Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com)
 
 **Research Supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
