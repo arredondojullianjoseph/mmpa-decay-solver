@@ -52,13 +52,13 @@ $\lambda_1,\ldots,\lambda_k$ must be distinct. A repeated value makes
 a factor in the product vanish and the formula divides by zero, so
 `bateman_linear_chain` rejects repeated decay constants.
 
-### Current implementation
+### Current Implementation
 
 - `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical Bateman solution.
 - `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026). Default order 32. One factorization per time point.
 - `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
 - Four-isotope chain $\lambda = [1.0, 0.5, 0.2, 0.0]$ vs Bateman (`data/four_isotope_chain.py`).
-- Gd-157-style chain $\lambda = [100.0, 0.0]$ vs a two-body closed form and vs MMPA (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$.
+- Gd-157-style chain $\lambda = [100.0, 0.0]$ vs a two-body closed form and vs MMPA (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
 
 Order 32 agrees with Bateman to $10^{-8}$ relative on significant inventories ($N \ge 10^{-6}$).
 
