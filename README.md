@@ -6,10 +6,10 @@ in nuclear decay chains. Currently in progress.
 The analytical Bateman solution for a linear decay chain is implemented
 and tested, as are automated tests that cover the parent-only initial condition and atom
 conservation. The MMPA matrix-exponential is also implemented and
-checked against Bateman on the four-isotope chain. **Next:** SciPy
+checked against Bateman on the four-isotope chain. **Next:** Gd-157 case, then SciPy
 Radau integration.
 
-**Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com)
+**Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com) (jjarredondo@liberty.edu)
 
 **Research Supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
