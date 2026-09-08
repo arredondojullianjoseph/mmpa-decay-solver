@@ -1,15 +1,16 @@
 # MMPA-Decay-Solver
 
 Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials
-in nuclear decay chains. Currently in progress.
+in nuclear decay chains.
 
 The analytical Bateman solution for a linear decay chain is implemented
-and tested, as are automated tests that cover the parent-only initial condition and atom
-conservation. The MMPA matrix-exponential is also implemented and
-checked against Bateman on the four-isotope chain. **Next:** Gd-157 case, then SciPy
-Radau integration.
+and tested, including parent-only initial conditions and atom
+conservation. The MMPA apply is implemented and checked against
+Bateman on a four-isotope chain and on a two-nuclide Gd-157-style
+absorber chain. **Next:** SciPy Radau integration.
 
-**Author:** Jullian J. Arredondo (ArredondoJullianJoseph@gmail.com) (jjarredondo@liberty.edu)
+**Author:** Jullian J. Arredondo (jjarredondo@liberty.edu)
+(ArredondoJullianJoseph@gmail.com)
 
 **Research Supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
 
@@ -54,19 +55,25 @@ a factor in the product vanish and the formula divides by zero, so
 ### Current implementation
 
 - `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical Bateman solution.
-- `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates exp(AΔt) via the MMPA method (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026).
-- `build_linear_chain_matrix` (`src/chain.py`) assembles the decaymatrix A.
+- `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026). Default order 32. One factorization per time point.
+- `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
+- Four-isotope chain $\lambda = [1.0, 0.5, 0.2, 0.0]$ vs Bateman (`data/four_isotope_chain.py`).
+- Gd-157-style chain $\lambda = [100.0, 0.0]$ vs a two-body closed form and vs MMPA (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$.
+
+Order 32 agrees with Bateman to $10^{-8}$ relative on significant inventories ($N \ge 10^{-6}$).
 
 ## Repository layout
 
 - `src/` — solver implementation
 - `tests/` — verification against analytical solutions
 - `data/` — decay constants and reference values
+- `.github/workflows/tests.yml` — `pytest` on every push
 
 ## Next steps
 
-- Extend to the gadolinium-157 absorber case
 - Compare MMPA against SciPy Radau
+- Interval-length sweep on the absorber chain
+- Multi-time evaluation from one factorization (not implemented)
 
 ## References
 
