@@ -1,13 +1,8 @@
 # MMPA-Decay-Solver
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials
-in nuclear decay chains.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Compares MMPA order 16 against order 32 on both chains. Automated tests cover all of these checks and print their own measured accuracy.
 
-The analytical Bateman solution for a linear decay chain is implemented
-and tested, including parent-only initial conditions and atom
-conservation. The MMPA apply is implemented and checked against
-Bateman on a four-isotope chain and on a two-nuclide Gd-157-style
-absorber chain. **Next:** SciPy Radau integration.
+Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before scaling to real cross sections and a burnup matrix derived from a low-order neutronics model.
 
 **Author:** Jullian J. Arredondo (jjarredondo@liberty.edu)
 (ArredondoJullianJoseph@gmail.com)
@@ -52,15 +47,62 @@ $\lambda_1,\ldots,\lambda_k$ must be distinct. A repeated value makes
 a factor in the product vanish and the formula divides by zero, so
 `bateman_linear_chain` rejects repeated decay constants.
 
-### Current Implementation
+## Implementation
 
-- `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical Bateman solution.
-- `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026). Default order 32. One factorization per time point.
-- `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
-- Four-isotope chain $\lambda = [1.0, 0.5, 0.2, 0.0]$ vs Bateman (`data/four_isotope_chain.py`).
-- Gd-157-style chain $\lambda = [100.0, 0.0]$ vs a two-body closed form and vs MMPA (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
+- **Bateman solution:** `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical solution above.
+- **Decay matrix:** `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
+- **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026). Default order 32. One factorization per time point.
+- **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
+- **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`).
+- **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
+- **Automated tests:** `tests/` covers all checks below and prints its own measured max relative error when run with `pytest -s`.
 
-Order 32 agrees with Bateman to $10^{-8}$ relative on significant inventories ($N \ge 10^{-6}$).
+## Verification results
+
+### MMPA order 32 vs Bateman
+
+Order 32 is gated at $10^{-8}$ relative error against Bateman on significant inventories ($N \ge 10^{-6}$).
+
+Running `pytest -s tests/test_mmpa_vs_bateman.py tests/test_gd157_vs_bateman.py`:
+
+| Chain | Max relative error |
+| --- | --- |
+| Four-isotope | $2.657\times10^{-9}$ |
+| Gd-157 | $2.624\times10^{-9}$ |
+
+Both agree with Bateman well inside the $10^{-8}$ gate.
+
+### MMPA order 16 vs order 32
+
+Order 16 is checked against order 32 because as a lower ordered polynomial it should be less acurate if the solver is functioning correctly.
+
+Running `pytest -s tests/test_mmpa_order_comparison.py`:
+
+| Chain | Order 16 max relative error | Order 32 max relative error |
+| --- | --- | --- |
+| Four-isotope | $6.915\times10^{-3}$ | $2.657\times10^{-9}$ |
+| Gd-157 | $7.036\times10^{-3}$ | $2.624\times10^{-9}$ |
+
+Order 16 is roughly six orders of magnitude worse than order 32 on both chains.
+
+### Radau vs Bateman
+
+Radau is gated at the same $10^{-8}$ as MMPA.
+
+Running `pytest -s tests/test_radau_vs_bateman.py`:
+
+| Chain | Max relative error |
+| --- | --- |
+| Four-isotope | $2.574\times10^{-9}$ |
+| Gd-157 | $7.311\times10^{-9}$ |
+
+Both agree with Bateman well inside the $10^{-8}$ gate.
+
+## Limitations
+
+- Toy decay chains, not real cross sections; real cross sections and flux require the coupled neutronics model.
+- Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
+- No interval-length sweep on the absorber chain yet.
 
 ## Repository layout
 
@@ -68,12 +110,6 @@ Order 32 agrees with Bateman to $10^{-8}$ relative on significant inventories ($
 - `tests/` — verification against analytical solutions
 - `data/` — decay constants and reference values
 - `.github/workflows/tests.yml` — `pytest` on every push
-
-## Next steps
-
-- Compare MMPA against SciPy Radau
-- Interval-length sweep on the absorber chain
-- Multi-time evaluation from one factorization (not implemented)
 
 ## References
 
