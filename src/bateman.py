@@ -1,20 +1,13 @@
 """
 bateman.py
 
-Closed-form solution for a linear decay chain (Bateman 1910). This is
-the exact analytical solution. Only handles the case where every atom starts in the parent nuclide
-(N1) and every daughter starts at zero. 
+Closed-form solution for a linear decay chain.
 """
 
 import numpy as np
 
 
 def bateman_linear_chain(lambdas, t, n0_parent=1.0):
-    """
-    Calculates the Bateman equations for a linear radioactive decay
-    chain: N1 -> N2 -> ... -> Nn. This assumes a straight chain with no
-    branching and requires all decay constants to be unique.
-    """
     
     lambdas = np.asarray(lambdas, dtype=float)
     t = np.atleast_1d(np.asarray(t, dtype=float))
