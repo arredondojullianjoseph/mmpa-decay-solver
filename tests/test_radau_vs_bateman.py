@@ -13,7 +13,7 @@ from data.four_isotope_chain import lambdas as l4, n0 as n0_4, t_grid as t_4
 from data.gd157_chain import lambdas as l_gd, n0 as n0_gd, t_grid as t_gd
 
 SIGNIFICANT_THRESHOLD = 1e-6
-GATE_RTOL = 1e-8 
+GATE_RTOL = 1e-8  
 
 def test_radau_matches_bateman_on_four_isotope_chain():
     a_matrix = build_linear_chain_matrix(l4)
@@ -21,7 +21,11 @@ def test_radau_matches_bateman_on_four_isotope_chain():
     radau_result = radau_linear_chain(a_matrix, t_4, n0_4)
     significant = np.abs(bateman_ref) >= SIGNIFICANT_THRESHOLD
     assert significant.any(), "mask is empty; nothing was actually checked"
-    np.testing.assert_allclose(radau_result[significant], bateman_ref[significant], rtol=GATE_RTOL)
+
+    rel_err = np.abs(radau_result[significant] - bateman_ref[significant]) / np.abs(bateman_ref[significant])
+    max_rel_err = rel_err.max()
+    print(f"\nRadau vs Bateman, four-isotope chain: max relative error = {max_rel_err:.3e}")
+    assert max_rel_err < GATE_RTOL
 
 def test_radau_matches_bateman_on_gd157_chain():
     a_matrix = build_linear_chain_matrix(l_gd)
@@ -29,7 +33,11 @@ def test_radau_matches_bateman_on_gd157_chain():
     radau_result = radau_linear_chain(a_matrix, t_gd, n0_gd)
     significant = np.abs(bateman_ref) >= SIGNIFICANT_THRESHOLD
     assert significant.any(), "mask is empty; nothing was actually checked"
-    np.testing.assert_allclose(radau_result[significant], bateman_ref[significant], rtol=GATE_RTOL)
+
+    rel_err = np.abs(radau_result[significant] - bateman_ref[significant]) / np.abs(bateman_ref[significant])
+    max_rel_err = rel_err.max()
+    print(f"\nRadau vs Bateman, Gd-157 chain: max relative error = {max_rel_err:.3e}")
+    assert max_rel_err < GATE_RTOL
 
 def test_radau_conserves_atoms_on_four_isotope_chain():
     a_matrix = build_linear_chain_matrix(l4)
