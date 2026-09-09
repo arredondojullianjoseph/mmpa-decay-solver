@@ -1,7 +1,7 @@
 """
 test_mmpa_order_comparison.py
 
-Compares MMPA order 16 against order 32 on both chains.
+Compares MMPA order 16 against order 32 on both chains, using the coefficient tables already in src/mmpa.py.
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ from data.four_isotope_chain import lambdas as l4, n0 as n0_4, t_grid as t_4
 from data.gd157_chain import lambdas as l_gd, n0 as n0_gd, t_grid as t_gd
 
 SIGNIFICANT_THRESHOLD = 1e-6
-ORDER_32_GATE = 1e-8 
+ORDER_32_GATE = 1e-8  
 
 CHAINS = {
     "four_isotope": (l4, n0_4, t_4),
@@ -33,14 +33,18 @@ def _max_rel_err(a_matrix, lambdas, n0, t, order):
 def test_mmpa_order_32_meets_gate(chain_name):
     lambdas, n0, t = CHAINS[chain_name]
     a_matrix = build_linear_chain_matrix(lambdas)
-    assert _max_rel_err(a_matrix, lambdas, n0, t, order=32) < ORDER_32_GATE
+    max_rel_err = _max_rel_err(a_matrix, lambdas, n0, t, order=32)
+    print(f"\norder 32 vs Bateman, {chain_name} chain: max relative error = {max_rel_err:.3e}")
+    assert max_rel_err < ORDER_32_GATE
 
 @pytest.mark.parametrize("chain_name", CHAINS)
 def test_mmpa_order_16_is_less_accurate_than_order_32(chain_name):
     
-    #checks the ordering
+    #Checks the ordering,
     lambdas, n0, t = CHAINS[chain_name]
     a_matrix = build_linear_chain_matrix(lambdas)
     err_16 = _max_rel_err(a_matrix, lambdas, n0, t, order=16)
     err_32 = _max_rel_err(a_matrix, lambdas, n0, t, order=32)
+    print(f"\norder 16 vs Bateman, {chain_name} chain: max relative error = {err_16:.3e}")
+    print(f"order 32 vs Bateman, {chain_name} chain: max relative error = {err_32:.3e}")
     assert err_16 > err_32 #Order 16 uses fewer terms, so it should be worse than order 32 on the same chain.
