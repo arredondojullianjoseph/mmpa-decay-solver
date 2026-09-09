@@ -50,4 +50,8 @@ def test_mmpa_matches_bateman_on_gd157_chain():
     got = mmpa_linear_chain(a, t_grid, n0)
     significant = np.abs(ref) >= 1e-6
     assert significant.any()
-    np.testing.assert_allclose(got[significant], ref[significant], rtol=1e-8)
+
+    rel_err = np.abs(got[significant] - ref[significant]) / np.abs(ref[significant])
+    max_rel_err = rel_err.max()
+    print(f"\norder 32 MMPA vs Bateman, Gd-157 chain: max relative error = {max_rel_err:.3e}")
+    assert max_rel_err < 1e-8
