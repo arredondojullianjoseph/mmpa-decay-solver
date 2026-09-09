@@ -1,5 +1,6 @@
 """
 test_mmpa_vs_bateman.py
+
 Verifies MMPA against the analytical Bateman solution 
 """
 
@@ -23,11 +24,12 @@ def test_mmpa_matches_bateman_on_significant_inventory():
     mmpa_result = mmpa_linear_chain(a_matrix, t_grid, n0)
     significant = np.abs(bateman_ref) >= SIGNIFICANT_THRESHOLD
     assert significant.any(), "mask is empty; nothing was actually checked"
-    np.testing.assert_allclose(
-        mmpa_result[significant], bateman_ref[significant], rtol=1e-8
-    ) #every MMPA value must be within relative tolerance 10e−8 of its Bateman counterpart
-  
-#Wherever Bateman's true value is below 10e-6 this only checks the raw absolute error, not a relative one
+    rel_err = np.abs(mmpa_result[significant] - bateman_ref[significant]) / np.abs(bateman_ref[significant])
+    max_rel_err = rel_err.max()
+    print(f"\norder 32 MMPA vs Bateman, four-isotope chain: max relative error = {max_rel_err:.3e}")
+    assert max_rel_err < 1e-8 
+    
+#Wherever Bateman's true value is below 10e-6 this only checks the raw absolute error
     abs_err = np.abs(mmpa_result - bateman_ref)
     tiny_abs_err = abs_err[~significant]
     if tiny_abs_err.size: 
