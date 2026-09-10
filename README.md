@@ -91,10 +91,6 @@ Running `pytest -s tests/test_mmpa_order_comparison.py`:
 | 28 | $8.671\times10^{-8}$ | $6.698\times10^{-8}$ |
 | 32 | $2.657\times10^{-9}$ | $2.624\times10^{-9}$ |
 
-Orders 4 through 12 are far too inaccurate to use (relative errors above $10^{-1}$ for order 12 and worse for lower orders). This matches Chiba et al. (2026): their low-order coefficients target a 1% error on a full PWR pincell burnup matrix. Against this project's $10^{-4}$ success criterion,order 24 is the lowest order that passes on both ($4.430\times10^{-6}$ and $2.316\times10^{-6}$).
-
-### Radau vs Bateman
-
 Radau is gated at the same $10^{-8}$ as MMPA.
 
 Running `pytest -s tests/test_radau_vs_bateman.py`:
