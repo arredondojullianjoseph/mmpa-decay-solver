@@ -1,7 +1,9 @@
 """
 test_mmpa_order_comparison.py
 
-Compares MMPA order 16 against order 32 on both chains, using the coefficient tables already in src/mmpa.py.
+Sweeps every published MMPA order (Tables 2-4 of Chiba, Yamamoto, Nagano
+2026) against Bateman on both chains, and checks that accuracy improves
+with order.
 """
 
 import numpy as np
@@ -9,17 +11,19 @@ import pytest
 
 from src.bateman import bateman_linear_chain
 from src.chain import build_linear_chain_matrix
-from src.mmpa import mmpa_linear_chain
+from src.mmpa import mmpa_linear_chain, MMPA_COEFFS
 from data.four_isotope_chain import lambdas as l4, n0 as n0_4, t_grid as t_4
 from data.gd157_chain import lambdas as l_gd, n0 as n0_gd, t_grid as t_gd
 
 SIGNIFICANT_THRESHOLD = 1e-6
-ORDER_32_GATE = 1e-8  
+ORDER_32_GATE = 1e-8
 
 CHAINS = {
     "four_isotope": (l4, n0_4, t_4),
     "gd157": (l_gd, n0_gd, t_gd),
 }
+
+PUBLISHED_ORDERS = sorted(MMPA_COEFFS)  
 
 def _max_rel_err(a_matrix, lambdas, n0, t, order):
     bateman_ref = bateman_linear_chain(lambdas, t, n0_parent=n0[0])
@@ -38,13 +42,22 @@ def test_mmpa_order_32_meets_gate(chain_name):
     assert max_rel_err < ORDER_32_GATE
 
 @pytest.mark.parametrize("chain_name", CHAINS)
-def test_mmpa_order_16_is_less_accurate_than_order_32(chain_name):
-    
-    #Checks the ordering,
+def test_mmpa_error_decreases_with_order(chain_name):
+    """
+    Runs every published order and checks that error drops as order
+    goes up. 
+    """
     lambdas, n0, t = CHAINS[chain_name]
     a_matrix = build_linear_chain_matrix(lambdas)
-    err_16 = _max_rel_err(a_matrix, lambdas, n0, t, order=16)
-    err_32 = _max_rel_err(a_matrix, lambdas, n0, t, order=32)
-    print(f"\norder 16 vs Bateman, {chain_name} chain: max relative error = {err_16:.3e}")
-    print(f"order 32 vs Bateman, {chain_name} chain: max relative error = {err_32:.3e}")
-    assert err_16 > err_32 #Order 16 uses fewer terms, so it should be worse than order 32 on the same chain.
+
+    errors = []
+    for order in PUBLISHED_ORDERS:
+        err = _max_rel_err(a_matrix, lambdas, n0, t, order=order)
+        errors.append(err)
+        print(f"\norder {order:2d} vs Bateman, {chain_name} chain: max relative error = {err:.3e}")
+
+    for i in range(1, len(errors)):
+        assert errors[i] < errors[i - 1], (
+            f"order {PUBLISHED_ORDERS[i]} ({errors[i]:.3e}) is not more accurate "
+            f"than order {PUBLISHED_ORDERS[i - 1]} ({errors[i - 1]:.3e})"
+        )
