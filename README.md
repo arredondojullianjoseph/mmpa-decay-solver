@@ -1,6 +1,6 @@
 # MMPA-Decay-Solver
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps every published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Automated tests cover all of these checks and print their own measured accuracy.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Automated tests cover all of these checks and print their own measured accuracy.
 
 Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before scaling to real cross sections and a burnup matrix derived from a low-order neutronics model.
 
