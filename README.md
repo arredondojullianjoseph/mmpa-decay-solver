@@ -1,6 +1,6 @@
 # MMPA-Decay-Solver
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Compares MMPA order 16 against order 32 on both chains. Automated tests cover all of these checks and print their own measured accuracy.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps every published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Automated tests cover all of these checks and print their own measured accuracy.
 
 Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before scaling to real cross sections and a burnup matrix derived from a low-order neutronics model.
 
@@ -51,7 +51,7 @@ a factor in the product vanish and the formula divides by zero, so
 
 - **Bateman solution:** `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical solution above.
 - **Decay matrix:** `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
-- **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using the order-16 and order-32 coefficient tables from Chiba et al. (2026). Default order 32. One factorization per time point.
+- **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using all ten published coefficient tables from Chiba et al. (2026): orders 4, 6, 8, 10, 12, 16, 20, 24, 28, and 32. Default order 32. One factorization per time point.
 - **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
 - **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`).
 - **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
@@ -72,18 +72,26 @@ Running `pytest -s tests/test_mmpa_vs_bateman.py tests/test_gd157_vs_bateman.py`
 
 Both agree with Bateman well inside the $10^{-8}$ gate.
 
-### MMPA order 16 vs order 32
+### MMPA order sweep
 
-Order 16 is checked against order 32 because as a lower ordered polynomial it should be less acurate if the solver is functioning correctly.
+Every published order (4, 6, 8, 10, 12, 16, 20, 24, 28, 32) is checked against Bateman on both chains. A higher order has more polynomial terms, so error must strictly decrease as order goes up; the test fails if any order is not more accurate than the one before it.
 
 Running `pytest -s tests/test_mmpa_order_comparison.py`:
 
-| Chain | Order 16 max relative error | Order 32 max relative error |
+| Order | Four-isotope max relative error | Gd-157 max relative error |
 | --- | --- | --- |
-| Four-isotope | $6.915\times10^{-3}$ | $2.657\times10^{-9}$ |
-| Gd-157 | $7.036\times10^{-3}$ | $2.624\times10^{-9}$ |
+| 4 | $5.444\times10^{2}$ | $5.592\times10^{2}$ |
+| 6 | $1.739\times10^{2}$ | $7.343\times10^{1}$ |
+| 8 | $1.657\times10^{1}$ | $7.472\times10^{0}$ |
+| 10 | $3.738\times10^{0}$ | $2.623\times10^{0}$ |
+| 12 | $2.960\times10^{-1}$ | $3.016\times10^{-1}$ |
+| 16 | $6.915\times10^{-3}$ | $7.036\times10^{-3}$ |
+| 20 | $3.184\times10^{-4}$ | $1.233\times10^{-4}$ |
+| 24 | $4.430\times10^{-6}$ | $2.316\times10^{-6}$ |
+| 28 | $8.671\times10^{-8}$ | $6.698\times10^{-8}$ |
+| 32 | $2.657\times10^{-9}$ | $2.624\times10^{-9}$ |
 
-Order 16 is roughly six orders of magnitude worse than order 32 on both chains.
+Orders 4 through 12 are far too inaccurate to use (relative errors above $10^{-1}$ for order 12 and worse for lower orders). This matches Chiba et al. (2026): their low-order coefficients target a 1% error on a full PWR pincell burnup matrix. Against this project's $10^{-4}$ success criterion,order 24 is the lowest order that passes on both ($4.430\times10^{-6}$ and $2.316\times10^{-6}$).
 
 ### Radau vs Bateman
 
@@ -102,7 +110,7 @@ Both agree with Bateman well inside the $10^{-8}$ gate.
 
 - Toy decay chains, not real cross sections; real cross sections and flux require the coupled neutronics model.
 - Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
-- No interval-length sweep on the absorber chain yet.
+- No interval-length sweep on the absorber chain yet. The order sweep above varies MMPA order at a fixed time grid; it does not vary the absorber's interval length, which is the actual result the absorber case needs.
 
 ## Repository layout
 
@@ -126,5 +134,6 @@ approximation. *Ann. Nucl. Energy* 80:219–224.
 Chiba G, Yamamoto K, Nagano H. 2026. Revisiting mini-max polynomial
 approximation method for nuclear fuel depletion calculation.
 *Ann. Nucl. Energy* 227:111948.
-- Source of the order-16 and order-32 MMPA coefficient tables used in
-  `src/mmpa.py`.
+- Source of all ten MMPA coefficient tables (orders 4 through 32) used
+  in `src/mmpa.py`, and of the order-dependence result in the order
+  sweep above.
