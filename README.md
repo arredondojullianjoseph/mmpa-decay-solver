@@ -1,6 +1,6 @@
 # MMPA-Decay-Solver
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Automated tests cover all of these checks and print their own measured accuracy.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Sweeps absorber interval length $T$ at fixed order, evaluating each interval at $t = T$ only, and gates order 32 at $10^{-4}$. Automated tests cover all of these checks and print their own measured accuracy.
 
 Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before scaling to real cross sections and a burnup matrix derived from a low-order neutronics model.
 
@@ -55,6 +55,7 @@ a factor in the product vanish and the formula divides by zero, so
 - **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
 - **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`).
 - **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
+- **Absorber interval sweep:** `sweep_interval_lengths` (`src/absorber_sweep.py`) evaluates MMPA at $t = T$ on $T = \mathrm{logspace}(-3, 0, 31)$. `scripts/absorber_interval_sweep.py` writes the CSV and figure. Orders 8 and 16 are figure-only; order 32 is the gated default.
 - **Automated tests:** `tests/` covers all checks below and prints its own measured max relative error when run with `pytest -s`.
 
 ## Verification results
@@ -102,15 +103,30 @@ Running `pytest -s tests/test_radau_vs_bateman.py`:
 
 Both agree with Bateman well inside the $10^{-8}$ gate.
 
+### Absorber interval-length sweep
+
+In this sweep order is fixed and the absorber interval $T$ is swept over three decades, $10^{-3}$ to $10^{0}\,\mathrm{s}$ ($\lambda T \in [0.1, 100]$ for $\lambda = 100\,\mathrm{s}^{-1}$). Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$, so a point at $0.2T$ is a shorter interval, not a sample inside a step of length $T$.
+ 
+Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, the expected result since low order is step-length sensitive and order 32 is not.
+
+Running `pytest -s tests/test_gd157_interval_sweep.py`:
+
+| Order | Worst $T$ (s) | $\lambda T$ | Max relative error |
+| --- | --- | --- | --- |
+| 32 | $1.259\times10^{-1}$ | $1.259\times10^{1}$ | $5.397\times10^{-10}$ |
+
+Order 32 stays well inside the $10^{-4}$ gate at every $T$ in the sweep. 
+
 ## Limitations
 
 - Toy decay chains, not real cross sections; real cross sections and flux require the coupled neutronics model.
 - Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
-- No interval-length sweep on the absorber chain yet. The order sweep above varies MMPA order at a fixed time grid; it does not vary the absorber's interval length, which is the actual result the absorber case needs.
+- The absorber interval sweep scores each $T$ with an independent factorization at $t = T$. It does not reuse one factorization across a burnup step.
 
 ## Repository layout
 
 - `src/` — solver implementation
+- `scripts/` — CSV and figure writer for the absorber interval sweep
 - `tests/` — verification against analytical solutions
 - `data/` — decay constants and reference values
 - `.github/workflows/tests.yml` — `pytest` on every push
