@@ -15,7 +15,7 @@ jobs:
           python-version: "3.11"
 
       - name: install dependencies
-        run: pip install numpy scipy pytest
+        run: pip install numpy scipy pytest matplotlib
 
       - name: run tests
         run: pytest -v
