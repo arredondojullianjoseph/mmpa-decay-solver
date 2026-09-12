@@ -53,8 +53,8 @@ a factor in the product vanish and the formula divides by zero, so
 - **Decay matrix:** `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
 - **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using all ten published coefficient tables from Chiba et al. (2026): orders 4, 6, 8, 10, 12, 16, 20, 24, 28, and 32. Default order 32. One factorization per time point.
 - **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
-- **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`).
-- **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
+- **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`). A short linear sanity check with well-separated decay constants, not a stiffness test — the Gd-157 chain below is the stiff case.
+- **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). This is the stiff test in this project: $\lambda = 100\,\mathrm{s}^{-1}$ is far larger than any decay constant in the four-isotope chain, and $\lambda T$ reaches $100$ in the absorber interval sweep. Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
 - **Absorber interval sweep:** `sweep_interval_lengths` (`src/absorber_sweep.py`) evaluates MMPA at $t = T$ on $T = \mathrm{logspace}(-3, 0, 31)$. `scripts/absorber_interval_sweep.py` writes the CSV and figure. Orders 8 and 16 are figure-only; order 32 is the gated default.
 - **Automated tests:** `tests/` covers all checks below and prints its own measured max relative error when run with `pytest -s`.
 
