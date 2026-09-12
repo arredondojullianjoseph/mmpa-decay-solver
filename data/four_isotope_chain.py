@@ -3,8 +3,7 @@ four_isotope_chain.py
 
 A made-up 4-nuclide decay chain (N1 -> N2 -> N3 -> N4, N4 stable) for
 testing the Bateman solver. The decay constants are round numbers, not
-real half-lives so we can check the math works before we plug
-in the actual U-238 chain.
+real half-lives.
 """
 
 import numpy as np
