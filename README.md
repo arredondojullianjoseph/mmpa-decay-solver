@@ -54,8 +54,8 @@ a factor in the product vanish and the formula divides by zero, so
 - **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using all ten published coefficient tables from Chiba et al. (2026): orders 4, 6, 8, 10, 12, 16, 20, 24, 28, and 32. Default order 32. One factorization per time point.
 - **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
 - **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`). A short linear sanity check with well-separated decay constants, not a stiffness test — the Gd-157 chain below is the stiff case.
-- **Gd-157-style chain:** $\lambda = [100.0, 0.0]$ (`data/gd157_chain.py`). This is the stiff test in this project: $\lambda = 100\,\mathrm{s}^{-1}$ is far larger than any decay constant in the four-isotope chain, and $\lambda T$ reaches $100$ in the absorber interval sweep. Scaled toy rate, not $\sigma\phi$. Constants are test values by design; real cross sections and flux require the coupled neutronics model, out of scope here.
-- **Absorber interval sweep:** `sweep_interval_lengths` (`src/absorber_sweep.py`) evaluates MMPA at $t = T$ on $T = \mathrm{logspace}(-3, 0, 31)$. `scripts/absorber_interval_sweep.py` writes the CSV and figure. Orders 8 and 16 are figure-only; order 32 is the gated default.
+- **Gd-157 absorber step:** $A = A_{\mathrm{reaction}}(\phi)$ at fixed thermal flux (`data/gd157_chain.py`). Gd-157 is removed by $(n,\gamma)$ at $\sigma\phi = (2.54\times10^{-19}\,\mathrm{cm}^{2})(1.0\times10^{14}\,\mathrm{cm}^{-2}\mathrm{s}^{-1}) = 2.54\times10^{-5}\,\mathrm{s}^{-1}$; Gd-158 has no removal. Radioactive decay of both nuclides is neglected. $\sigma$ and $\phi$ are order-of-magnitude PWR-like values, not a lattice calculation; spatial self-shielding is out of scope here.
+- **Absorber interval sweep:** `sweep_interval_lengths` (`src/absorber_sweep.py`) evaluates MMPA at $t = T$ on times with $\sigma\phi T \in [0.1, 100]$. `scripts/absorber_interval_sweep.py` writes the CSV and figure. Orders 8 and 16 are figure-only; order 32 is the gated default.
 - **Automated tests:** `tests/` covers all checks below and prints its own measured max relative error when run with `pytest -s`.
 
 ## Verification results
@@ -105,21 +105,21 @@ Both agree with Bateman well inside the $10^{-8}$ gate.
 
 ### Absorber interval-length sweep
 
-In this sweep order is fixed and the absorber interval $T$ is swept over three decades, $10^{-3}$ to $10^{0}\,\mathrm{s}$ ($\lambda T \in [0.1, 100]$ for $\lambda = 100\,\mathrm{s}^{-1}$). Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$, so a point at $0.2T$ is a shorter interval, not a sample inside a step of length $T$.
+In this sweep order is fixed and the absorber interval $T$ is swept so that $\sigma\phi T \in [0.1, 100]$. Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$.
  
 Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, the expected result since low order is step-length sensitive and order 32 is not.
 
 Running `pytest -s tests/test_gd157_interval_sweep.py`:
 
-| Order | Worst $T$ (s) | $\lambda T$ | Max relative error |
+| Order | Worst $T$ (s) | $\sigma\phi T$ | Max relative error |
 | --- | --- | --- | --- |
-| 32 | $1.259\times10^{-1}$ | $1.259\times10^{1}$ | $5.397\times10^{-10}$ |
+| 32 | $4.956\times10^{5}$ | $1.259\times10^{1}$ | $5.397\times10^{-10}$ |
 
 Order 32 stays well inside the $10^{-4}$ gate at every $T$ in the sweep. 
 
 ## Limitations
 
-- Toy decay chains, not real cross sections; real cross sections and flux require the coupled neutronics model.
+- Capture rate uses a fixed assumed flux and a thermal $\sigma$, not a lattice-homogenized cross section or a neutronics-derived $\phi$. Spatial self-shielding is not modeled.
 - Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
 - The absorber interval sweep scores each $T$ with an independent factorization at $t = T$. It does not reuse one factorization across a burnup step.
 
