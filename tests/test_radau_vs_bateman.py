@@ -29,8 +29,12 @@ def test_radau_matches_bateman_on_four_isotope_chain():
 
 def test_radau_matches_bateman_on_gd157_chain():
     a_matrix = build_linear_chain_matrix(l_gd)
+    rate = l_gd[0]
+    span = 100.0
+    a_scaled = a_matrix * (span / rate)
+    t_scaled = np.asarray(t_gd, dtype=float) * (rate / span)
     bateman_ref = bateman_linear_chain(l_gd, t_gd, n0_parent=n0_gd[0])
-    radau_result = radau_linear_chain(a_matrix, t_gd, n0_gd)
+    radau_result = radau_linear_chain(a_scaled, t_scaled, n0_gd)
     significant = np.abs(bateman_ref) >= SIGNIFICANT_THRESHOLD
     assert significant.any(), "mask is empty; nothing was actually checked"
 
