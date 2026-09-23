@@ -91,9 +91,10 @@ MMPA_COEFFS = {
 
 DEFAULT_ORDER = 32
 
-def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
+def mmpa_factor(a_matrix, dt, order=DEFAULT_ORDER):
     """
-    Applies exp(a_matrix * dt) to n0 without ever forming the full matrix exponential.
+    Factors x = a_matrix*dt - c once. The result depends only on a_matrix, dt
+    and order, so one call serves any number of n0 vectors at that same dt.
     """
     if order not in MMPA_COEFFS:
         raise ValueError(
@@ -110,7 +111,14 @@ def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
     n = a_matrix.shape[0]
     x_matrix = a_matrix * dt - c * np.eye(n)
 
-    lu_piv = lu_factor(x_matrix)   
+    return lu_factor(x_matrix), c, coeffs, order
+
+def mmpa_apply_factored(factored, n0):
+    """
+    Runs the MMPA polynomial against an existing factorization from mmpa_factor.
+    """
+    lu_piv, c, coeffs, order = factored
+
     y = np.asarray(n0, dtype=float).copy() #Copies the initial vector so the loop below can alter y without changing the inital vector.
     result = coeffs[0] * y
 
@@ -119,6 +127,12 @@ def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
         y = y + 2.0 * c * lu_solve(lu_piv, y)
         result = result + coeffs[i] * y
     return result
+
+def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
+    """
+    Applies exp(a_matrix * dt) to n0 without ever forming the full matrix exponential.
+    """
+    return mmpa_apply_factored(mmpa_factor(a_matrix, dt, order=order), n0)
 
 def mmpa_linear_chain(a_matrix, t, n0, order=DEFAULT_ORDER):
     """
