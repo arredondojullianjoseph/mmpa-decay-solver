@@ -98,7 +98,7 @@ Running `pytest -s tests/test_radau_vs_bateman.py`:
 
 | Chain | Max relative error |
 | --- | --- |
-| Four-isotope | $2.574\times10^{-9}$ |
+| Four-isotope | $2.572\times10^{-9}$ |
 | Gd-157 | $7.311\times10^{-9}$ |
 
 Both agree with Bateman well inside the $10^{-8}$ gate.
