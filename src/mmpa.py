@@ -93,8 +93,7 @@ DEFAULT_ORDER = 32
 
 def mmpa_factor(a_matrix, dt, order=DEFAULT_ORDER):
     """
-    Factors x = a_matrix*dt - c once. The result depends only on a_matrix, dt
-    and order, so one call serves any number of n0 vectors at that same dt.
+    Factors x = a_matrix*dt - c once. 
     """
     if order not in MMPA_COEFFS:
         raise ValueError(
@@ -119,7 +118,7 @@ def mmpa_apply_factored(factored, n0):
     """
     lu_piv, c, coeffs, order = factored
 
-    y = np.asarray(n0, dtype=float).copy() #Copies the initial vector so the loop below can alter y without changing the inital vector.
+    y = np.asarray(n0, dtype=float).copy() #Copies the initial vector so the loop below can alter y without changing the initial vector.
     result = coeffs[0] * y
 
   #Each step updates y then adds its weighted share to the total
@@ -130,7 +129,7 @@ def mmpa_apply_factored(factored, n0):
 
 def expm_mmpa_apply(a_matrix, dt, n0, order=DEFAULT_ORDER):
     """
-    Applies exp(a_matrix * dt) to n0 without ever forming the full matrix exponential.
+    Applies exp(a_matrix * dt) to n0 without forming the full matrix exponential.
     """
     return mmpa_apply_factored(mmpa_factor(a_matrix, dt, order=order), n0)
 
