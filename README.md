@@ -1,6 +1,12 @@
 # MMPA-Decay-Solver
 
+[![tests](https://github.com/arredondojullianjoseph/mmpa-decay-solver/actions/workflows/tests.yml/badge.svg)](https://github.com/arredondojullianjoseph/mmpa-decay-solver/actions/workflows/tests.yml)
+
 Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Sweeps absorber interval length $T$ at fixed order, evaluating each interval at $t = T$ only, and gates order 32 at $10^{-4}$. Automated tests cover all of these checks and print their own measured accuracy.
+
+**Results:** at order 32, the maximum relative error versus Bateman is about $2.6\times10^{-9}$ on both test chains (figure below).
+
+![MMPA max relative error vs Bateman by order](plots/error_vs_order.png)
 
 Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before scaling to real cross sections and a burnup matrix derived from a low-order neutronics model.
 
@@ -123,10 +129,15 @@ Order 32 stays well inside the $10^{-4}$ gate at every $T$ in the sweep.
 - Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
 - The absorber interval sweep scores each $T$ with an independent factorization at $t = T$. It does not reuse one factorization across a burnup step.
 
+## Next
+
+Planned: branching chains, reuse of one MMPA factorization across substeps, and replacing the toy flux and thermal $\sigma$ with a burnup matrix from a low-order neutronics model.
+
 ## Repository layout
 
 - `src/` — solver implementation
-- `scripts/` — CSV and figure writer for the absorber interval sweep
+- `scripts/` — CSV and figure writer for the absorber interval sweep; `plot_error_vs_order.py` writes `plots/error_vs_order.png`
+- `plots/` — order-sweep figure
 - `tests/` — verification against analytical solutions
 - `data/` — decay constants and reference values
 - `.github/workflows/tests.yml` — `pytest` on every push
