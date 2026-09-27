@@ -131,7 +131,9 @@ Order 32 stays well inside the $10^{-4}$ gate at every $T$ in the sweep.
 
 ## Next
 
-Planned: branching chains, reuse of one MMPA factorization across substeps, and replacing the toy flux and thermal $\sigma$ with a burnup matrix from a low-order neutronics model.
+Planned: reuse of one MMPA factorization across substeps (multi-time evaluation from a single matrix solve).
+
+Out of scope for this repo, follow-on graduate work: branching chains, and replacing the toy flux and thermal $\sigma$ with a burnup matrix from a low-order neutronics model.
 
 ## Repository layout
 
