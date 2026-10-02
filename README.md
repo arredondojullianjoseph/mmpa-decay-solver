@@ -13,8 +13,6 @@ Scope: verifies MMPA's matrix-exponential accuracy on toy decay chains before sc
 **Author:** Jullian J. Arredondo (jjarredondo@liberty.edu)
 (ArredondoJullianJoseph@gmail.com)
 
-**Research Supervisor:** Dr. Timo Budarz (tbudarz@liberty.edu)
-
 ## Mathematical model
 
 ### Governing equation
