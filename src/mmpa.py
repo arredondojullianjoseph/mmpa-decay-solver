@@ -145,3 +145,24 @@ def mmpa_linear_chain(a_matrix, t, n0, order=DEFAULT_ORDER):
     for k, tk in enumerate(t):
         density[:, k] = expm_mmpa_apply(a_matrix, tk, n0, order=order)
     return density
+
+
+def mmpa_multi_time(a_matrix, dt, n0, n_steps, order=DEFAULT_ORDER):
+    """
+    One factorization of (A*dt - c I), then apply it n_steps times.
+    Returns densities at n_steps*dt.
+    """
+    if n_steps < 0:
+        raise ValueError("n_steps must be non-negative")
+
+    n0 = np.asarray(n0, dtype=float)
+    n = a_matrix.shape[0]
+    density = np.zeros((n, n_steps + 1))
+    density[:, 0] = n0
+    if n_steps == 0:
+        return density
+
+    factored = mmpa_factor(a_matrix, dt, order=order)
+    for k in range(n_steps):
+        density[:, k + 1] = mmpa_apply_factored(factored, density[:, k])
+    return density
