@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/arredondojullianjoseph/mmpa-decay-solver/actions/workflows/tests.yml/badge.svg)](https://github.com/arredondojullianjoseph/mmpa-decay-solver/actions/workflows/tests.yml)
 
-Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Sweeps absorber interval length $T$ at fixed order, evaluating each interval at $t = T$ only, and gates order 32 at $10^{-4}$. Automated tests cover all of these checks and print their own measured accuracy.
+Mini-Max Polynomial Approximation (MMPA) solver for matrix exponentials in nuclear decay chains. Verifies MMPA against the analytical Bateman solution on a four-isotope decay chain and a two-nuclide Gd-157-style absorber chain, and checks it independently against a SciPy Radau reference solver. Sweeps published MMPA order (4 through 32) on both chains and checks that accuracy improves with order. Sweeps absorber interval length $T$ at fixed order, evaluating each interval at $t = T$ only, and gates order 32 at $10^{-4}$. Walks equal substeps from one factorization (`mmpa_multi_time`) and gates that walk against Bateman at $10^{-8}$. Automated tests cover all of these checks and print their own measured accuracy.
 
 **Results:** at order 32, the maximum relative error versus Bateman is about $2.6\times10^{-9}$ on both test chains (figure below).
 
@@ -55,7 +55,8 @@ a factor in the product vanish and the formula divides by zero, so
 
 - **Bateman solution:** `bateman_linear_chain` (`src/bateman.py`) evaluates the analytical solution above.
 - **Decay matrix:** `build_linear_chain_matrix` (`src/chain.py`) assembles the decay matrix $A$.
-- **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using all ten published coefficient tables from Chiba et al. (2026): orders 4, 6, 8, 10, 12, 16, 20, 24, 28, and 32. Default order 32. One factorization per time point.
+- **MMPA solver:** `expm_mmpa_apply` / `mmpa_linear_chain` (`src/mmpa.py`) evaluates $\exp(A\Delta t)N_0$ via MMPA (Kawamoto et al. 2015), using all ten published coefficient tables from Chiba et al. (2026): orders 4, 6, 8, 10, 12, 16, 20, 24, 28, and 32. Default order 32. `mmpa_linear_chain` factors once per time point.
+- **Multi-time walk:** `mmpa_multi_time` (`src/mmpa.py`) factors $(A\Delta t - cI)$ once, then applies that factorization `n_steps` times. Returns densities at $n_{\mathrm{steps}}\Delta t$.
 - **Radau reference solver:** `radau_linear_chain` (`src/radau.py`) integrates $\mathrm{d}N/\mathrm{d}t = AN$ with SciPy's Radau method, independent of MMPA.
 - **Four-isotope chain:** $\lambda = [1.0, 0.5, 0.2, 0.0]$ (`data/four_isotope_chain.py`). A short linear sanity check with well-separated decay constants, not a stiffness test — the Gd-157 chain below is the stiff case.
 - **Gd-157 absorber step:** $A = A_{\mathrm{reaction}}(\phi)$ at fixed thermal flux (`data/gd157_chain.py`). Gd-157 is removed by $(n,\gamma)$ at $\sigma\phi = (2.54\times10^{-19}\,\mathrm{cm}^{2})(1.0\times10^{14}\,\mathrm{cm}^{-2}\mathrm{s}^{-1}) = 2.54\times10^{-5}\,\mathrm{s}^{-1}$; Gd-158 has no removal. Radioactive decay of both nuclides is neglected. $\sigma$ and $\phi$ are order-of-magnitude PWR-like values, not a lattice calculation; spatial self-shielding is out of scope here.
@@ -121,15 +122,28 @@ Running `pytest -s tests/test_gd157_interval_sweep.py`:
 
 Order 32 stays well inside the $10^{-4}$ gate at every $T$ in the sweep.
 
+### Multi-time walk from one factorization
+
+Order 32 is gated at $10^{-8}$ relative error against Bateman on significant inventories ($N \ge 10^{-6}$), scoring $t = \Delta t, \ldots, K\Delta t$.
+
+Running `pytest -s tests/test_mmpa_multi_time.py`:
+
+| Chain | $\Delta t$ | Steps | Max relative error |
+| --- | --- | --- | --- |
+| Four-isotope | $0.5\,\mathrm{s}$ | 20 | $1.886\times10^{-11}$ |
+| Gd-157 | $0.1/\sigma\phi$ | 10 | $4.074\times10^{-14}$ |
+
+Both agree with Bateman well inside the $10^{-8}$ gate.
+
+The same module also checks that twenty equal steps call `lu_factor` once, that $K = 0$ returns $N_0$, and that a negative step count is rejected.
+
 ## Limitations
 
 - Capture rate uses a fixed assumed flux and a thermal $\sigma$, not a lattice-homogenized cross section or a neutronics-derived $\phi$. Spatial self-shielding is not modeled.
-- Multi-time evaluation from one factorization is not implemented; MMPA still factors once per time point.
 - The absorber interval sweep scores each $T$ with an independent factorization at $t = T$. It does not reuse one factorization across a burnup step.
+- `mmpa_multi_time` reuses one factorization on equal steps only. Arbitrary times still use one factorization per time point.
 
 ## Next
-
-Planned: reuse of one MMPA factorization across substeps (multi-time evaluation from a single matrix solve).
 
 Out of scope for this repo, follow-on graduate work: branching chains, and replacing the toy flux and thermal $\sigma$ with a burnup matrix from a low-order neutronics model.
 
