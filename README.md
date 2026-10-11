@@ -110,9 +110,9 @@ Both agree with Bateman well inside the $10^{-8}$ gate.
 
 ### Absorber interval-length sweep
 
-In this sweep order is fixed and the absorber interval $T$ is swept so that $\sigma\phi T \in [0.1, 100]$. Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$.
+Rhis sweep order is fixed and the absorber interval $T$ is swept so that $\sigma\phi T \in [0.1, 100]$. Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$.
 
-Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, the expected result since low order is step-length sensitive and order 32 is not.
+Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, this is expected since low order has grearer step-length sensitivity than order 32.
 
 ![MMPA max relative error vs Bateman by absorber interval length](plots/absorber_interval_sweep.png)
 
