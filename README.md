@@ -114,6 +114,8 @@ In this sweep order is fixed and the absorber interval $T$ is swept so that $\si
 
 Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, the expected result since low order is step-length sensitive and order 32 is not.
 
+![MMPA max relative error vs Bateman by absorber interval length](plots/absorber_interval_sweep.png)
+
 Running `pytest -s tests/test_gd157_interval_sweep.py`:
 
 | Order | Worst $T$ (s) | $\sigma\phi T$ | Max relative error |
