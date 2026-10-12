@@ -110,9 +110,9 @@ Both agree with Bateman well inside the $10^{-8}$ gate.
 
 ### Absorber interval-length sweep
 
-Rhis sweep order is fixed and the absorber interval $T$ is swept so that $\sigma\phi T \in [0.1, 100]$. Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$.
+This sweep order is fixed and the absorber interval $T$ is swept so that $\sigma\phi T \in [0.1, 100]$. Each interval is scored at $t = T$ only. Interior points are excluded; the solver computes $\exp(At)N_0$ independently at each $t$.
 
-Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, this is expected since low order has grearer step-length sensitivity than order 32.
+Order 32 is gated at $10^{-4}$ on significant inventories ($N \ge 10^{-6}$). Orders 8 and 16 are plotted but not gated; they exceed $10^{-4}$ on this grid, this is expected since low order has greater step-length sensitivity than order 32.
 
 ![MMPA max relative error vs Bateman by absorber interval length](plots/absorber_interval_sweep.png)
 
@@ -152,8 +152,8 @@ Out of scope for this repo, follow-on graduate work: branching chains, and repla
 ## Repository layout
 
 - `src/` — solver implementation
-- `scripts/` — CSV and figure writer for the absorber interval sweep; `plot_error_vs_order.py` writes `plots/error_vs_order.png`
-- `plots/` — order-sweep figure
+- `scripts/` — `absorber_interval_sweep.py` writes `plots/absorber_interval_sweep.png`; `plot_error_vs_order.py` writes `plots/error_vs_order.png`
+- `plots/` — order-sweep and interval-sweep figures
 - `tests/` — verification against analytical solutions
 - `data/` — decay constants and reference values
 - `.github/workflows/tests.yml` — `pytest` on every push
