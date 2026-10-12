@@ -22,7 +22,7 @@ from data.gd157_chain import CAPTURE_RATE, interval_sweep_times
 from src.absorber_sweep import PLOT_ORDERS, TOLERANCE, sweep_interval_lengths
 from src.mmpa import DEFAULT_ORDER
 
-OUTPUT_DIR = ROOT / "results"
+OUTPUT_DIR = ROOT / "plots"
 
 
 def write_csv(t_values, errors_by_order, path):
